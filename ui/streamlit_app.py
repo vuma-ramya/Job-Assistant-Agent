@@ -51,6 +51,17 @@ if "skills" not in st.session_state:
 if "resume_uploaded" not in st.session_state:
     st.session_state.resume_uploaded = False
 
+# Wake up backend
+if st.sidebar.button("🔄 Wake up backend", use_container_width=True):
+    with st.spinner("Waking up backend (~30s)..."):
+        try:
+            r = requests.get(f"{BACKEND_URL}/health", timeout=60)
+            if r.status_code == 200:
+                st.sidebar.success("✅ Backend is live!")
+            else:
+                st.sidebar.error("Backend returned an error")
+        except Exception as e:
+            st.sidebar.error(f"Still waking up: {e}")
 
 # ── Sidebar — resume upload ────────────────────────────────────────────────────
 with st.sidebar:
