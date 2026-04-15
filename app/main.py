@@ -124,9 +124,10 @@ def cleanup_session(session_id: str):
 if __name__ == "__main__":
     import uvicorn
     import os
+    port = int(os.getenv("PORT", os.getenv("APP_PORT", 8000)))
     uvicorn.run(
         "app.main:app",
         host=os.getenv("APP_HOST", "0.0.0.0"),
-        port=int(os.getenv("APP_PORT", 8000)),
-        reload=True,
+        port=port,
+        reload=False,
     )
