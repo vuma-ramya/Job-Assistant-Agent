@@ -246,7 +246,6 @@ tests/test_tools.py::test_generate_interview_prep_no_resume     PASSED
 tests/test_tools.py::test_route_intent_valid                    PASSED
 ```
 
----
 
 ## 🛠️ Tech Stack
 
@@ -267,25 +266,6 @@ tests/test_tools.py::test_route_intent_valid                    PASSED
 
 ---
 
-## 📖 Written Explanation
-
-### What problem the agent solves
-
-Job seekers applying to multiple roles spend significant time manually tailoring resumes and writing cover letters from scratch for each application. The Smart Job Application Assistant is an agentic AI chatbot that automates this entire workflow — analyzing a resume against a job description, identifying skill gaps, generating a tailored cover letter, and producing personalized interview preparation — all through a single conversational interface that anyone can use without technical knowledge.
-
-### Architecture and tools used
-
-The system uses a **LangGraph state graph** to orchestrate four specialized tool nodes. When a user sends a message, an intent classifier node (powered by an LLM with a structured system prompt) routes the request to the correct tool: gap analysis, cover letter generation, interview prep, or general conversation. The resume is parsed using **PyPDF2** with a custom section-aware chunker that detects resume headings before splitting — improving retrieval precision over naive character-based splitting. Chunks are embedded using **SentenceTransformers (all-MiniLM-L6-v2)** and stored in **ChromaDB** with cosine similarity indexing. The cover letter and interview prep tools use **RAG** — retrieving the top-k most semantically relevant resume chunks for a given job description before passing them as context to the LLM. The backend is a **FastAPI** REST API with three endpoints (upload, chat, cleanup), and the frontend is a **Streamlit** chat interface with session state management.
-
-### My specific contribution
-
-I designed the full agentic pipeline using LangGraph's `StateGraph`, defined tool nodes for each of the four capabilities, and implemented the intent classification routing with explicit system prompt engineering to prevent hallucinated tool selection. I built the RAG retrieval pipeline using ChromaDB with a custom section-aware resume chunker that outperformed standard text splitters by 23% in retrieval precision on a held-out test set. I also wrote the FastAPI REST layer with session management, the Dockerfile and docker-compose configuration, and the GitHub Actions CI/CD workflow for automated testing and deployment.
-
-### Challenges encountered and how I solved them
-
-The main challenge was making the LangGraph agent reliably select the correct tool without hallucinating a tool call order, especially when users sent ambiguous messages like "help me with this JD" that could map to multiple tools. I solved this by adding explicit tool selection criteria in the classifier system prompt and validating the output against a fixed set of intent labels, defaulting to the general node on any unrecognised output — eliminating routing failures entirely. A second challenge was resume parsing: resumes come in wildly different formats, and naive character-based splitting would break mid-sentence or mid-bullet, degrading retrieval quality. I built a heading-aware chunker using regex to detect common resume section headers and keep each section as a semantic unit before applying size-based splitting as a fallback. This made retrieved chunks contextually coherent and significantly improved the quality of generated cover letters.
-
----
 
 ## 📄 License
 
