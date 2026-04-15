@@ -85,7 +85,7 @@ with st.sidebar:
                             "session_id": session_id,
                             "candidate_name": candidate_name,
                         },
-                        timeout=60,
+                        timeout=120,
                     )
                     resp.raise_for_status()
                     data = resp.json()
@@ -177,7 +177,7 @@ if prompt := st.chat_input("Paste a job description or ask me anything…"):
                         "message": prompt,
                         "history": history,
                     },
-                    timeout=120,
+                    timeout=180,
                 )
                 resp.raise_for_status()
                 data = resp.json()
